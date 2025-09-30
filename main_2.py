@@ -1,6 +1,6 @@
 import requests
-from bs4 import BeautifulSoup
-from time import sleep
+import bs4 
+import time 
 import local as lcl
 
 # Функция проверки элемента, возвращает текст или "Отсутствует информация"
@@ -11,7 +11,7 @@ def check(element, start_idx):
 def get_last_page(search_query):
     url = f'https://obuv-tut2000.ru/magazin/search?gr_smart_search=1&search_text={search_query}'
     response = requests.get(url)
-    soup = BeautifulSoup(response.text, "lxml")
+    soup = bs4.BeautifulSoup(response.text, "lxml")
     last_page_tag = soup.find("li", class_="page-num page_last")
     return int(last_page_tag.text) if last_page_tag else 1
 
@@ -24,7 +24,7 @@ def generate_product_urls(search_query):
         else:
             url = f'https://obuv-tut2000.ru/magazin/search?p={page}&gr_smart_search=1&search_text={search_query}'
         response = requests.get(url)
-        soup = BeautifulSoup(response.text, "lxml")
+        soup = bs4.BeautifulSoup(response.text, "lxml")
         items = soup.find_all("div", class_="product-item__top")
         for item in items:
             href = item.find("a").get("href")
@@ -33,7 +33,7 @@ def generate_product_urls(search_query):
 # Парсим данные каждого товара
 def parse_product(url):
     response = requests.get(url)
-    soup = BeautifulSoup(response.text, "lxml")
+    soup = bs4.BeautifulSoup(response.text, "lxml")
     data = soup.find("div", class_="card-page")
     if not data:
         return None
@@ -87,7 +87,7 @@ search_query = input(f"{lcl.ENTER_SEARCH_QUERY}:")
 products = []
 
 for url in generate_product_urls(search_query):
-    sleep(3)
+    time.sleep(3)
     product_data = parse_product(url)
     if product_data:
         products.append(product_data)
